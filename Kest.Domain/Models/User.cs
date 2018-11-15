@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Kest.Domain.Models
+﻿namespace Kest.Domain.Models
 {
-    public class User:Entity
+    public class User : IEntity<int>
     {
-        public string Name { get; private set; }
+        public int Id { get; private set; }
+
+        public string UserId { get; private set; }
+        public string UserName { get; private set; }
         public string Password { get; private set; }
+        public RoleId RoleId { get; private set; }
     }
 }

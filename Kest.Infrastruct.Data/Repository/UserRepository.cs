@@ -10,7 +10,7 @@ namespace Kest.Infrastruct.Data.Repository
     /// <summary>
     /// Customer仓储，操作对象还是领域对象
     /// </summary>
-    public class UserRepository : BaseRepository<User>, IUserRepository
+    public class UserRepository : BaseRepository<User,int>, IUserRepository
     {
         
 

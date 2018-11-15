@@ -1,10 +1,7 @@
-﻿using NPoco;
+﻿using System;
+
+using NPoco;
 using NPoco.FluentMappings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kest.Infrastruct.Data.NPoco
 {
@@ -15,7 +12,7 @@ namespace Kest.Infrastruct.Data.NPoco
         static NPocoDatabase()
         {
             factory = DatabaseFactory.Config(x => {
-                x.UsingDatabase(() => new NPocoDatabase("DB"));
+                x.UsingDatabase(() => new NPocoDatabase("connectionStringName"));
                 x.WithFluentConfig(FluentMappingConfiguration.Configure(new NPocoDatabaseMappings()));
             });
         }
@@ -31,7 +28,7 @@ namespace Kest.Infrastruct.Data.NPoco
             }
         }
 
-        public DkDatabase(string connectionStringName)
+        public NPocoDatabase(string connectionStringName)
             : base(connectionStringName)
         {
             this.EnableAutoSelect = true;
@@ -43,5 +40,4 @@ namespace Kest.Infrastruct.Data.NPoco
             base.OnException(ex);
         }
     }
-}
 }

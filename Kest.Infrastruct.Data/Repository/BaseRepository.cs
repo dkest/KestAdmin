@@ -1,4 +1,7 @@
 ﻿using Kest.Domain.Interfaces;
+using Kest.Domain.Models;
+using Kest.Infrastruct.Data.NPoco;
+using NPoco;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,116 +14,46 @@ namespace Kest.Infrastruct.Data.Repository
     /// 泛型仓储，实现泛型仓储接口
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
+    public abstract class BaseRepository<TEntity, TKey> : IBaseRepository<TEntity, TKey>
+        where TEntity : class, IEntity<TKey>
+        where TKey : struct
     {
-        public Task<int> Add(TEntity model)
+        public virtual IEnumerable<TEntity> GetAll()
         {
-            throw new NotImplementedException();
+            return NPocoDatabase.Instance.Fetch<TEntity>();
         }
 
-        public Task<bool> Delete(TEntity model)
+        public virtual PageEnumerable<TEntity> GetPage(int page, int pageSize)
         {
-            throw new NotImplementedException();
+            return CreatePageEnumerable(NPocoDatabase.Instance.Page<TEntity>(page, pageSize, "ORDER BY Id DESC"));
         }
 
-        public Task<bool> DeleteById(object id)
+        public virtual TEntity GetById(TKey id)
         {
-            throw new NotImplementedException();
+            return NPocoDatabase.Instance.FirstOrDefault<TEntity>("WHERE Id = @0", id);
         }
 
-        public Task<bool> DeleteByIds(object[] ids)
+        public virtual void Save(TEntity item)
         {
-            throw new NotImplementedException();
+            if (NPocoDatabase.Instance.Exists<TEntity>((object)item.Id)) NPocoDatabase.Instance.Update(item);
+            else NPocoDatabase.Instance.Insert(item);
         }
 
-        public Task<List<TEntity>> Query()
+        public virtual void Remove(TEntity item)
         {
-            throw new NotImplementedException();
+            NPocoDatabase.Instance.Delete(item);
         }
 
-        public Task<List<TEntity>> Query(string strWhere)
+        protected static PageEnumerable<TEntity> CreatePageEnumerable(Page<TEntity> page)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<TEntity>> Query(Expression<Func<TEntity, bool>> whereExpression)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<TEntity>> Query(Expression<Func<TEntity, bool>> whereExpression, string strOrderByFileds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<TEntity>> Query(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, object>> orderByExpression, bool isAsc = true)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<TEntity>> Query(string strWhere, string strOrderByFileds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<TEntity>> Query(Expression<Func<TEntity, bool>> whereExpression, int intTop, string strOrderByFileds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<TEntity>> Query(string strWhere, int intTop, string strOrderByFileds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<TEntity>> Query(Expression<Func<TEntity, bool>> whereExpression, int intPageIndex, int intPageSize, string strOrderByFileds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<TEntity>> Query(string strWhere, int intPageIndex, int intPageSize, string strOrderByFileds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<TEntity> QueryById(object objId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<TEntity> QueryById(object objId, bool blnUseCache = false)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<TEntity>> QueryByIds(object[] ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<TEntity>> QueryPage(Expression<Func<TEntity, bool>> whereExpression, int intPageIndex = 0, int intPageSize = 20, string strOrderByFileds = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int SaveChanges()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> Update(TEntity model)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> Update(TEntity entity, string strWhere)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> Update(TEntity entity, List<string> columns = null, List<string> ignoreColumns = null, string strWhere = "")
-        {
-            throw new NotImplementedException();
+            return new PageEnumerable<TEntity>
+            {
+                CurrentPage = (int)page.CurrentPage,
+                Items = page.Items,
+                ItemsPerPage = (int)page.ItemsPerPage,
+                TotalItems = (int)page.TotalItems,
+                TotalPages = (int)page.TotalPages
+            };
         }
     }
 }
