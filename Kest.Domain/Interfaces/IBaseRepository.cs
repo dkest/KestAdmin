@@ -17,7 +17,8 @@ namespace Kest.Domain.Interfaces
 
         void Remove(TEntity item);
         void Save(TEntity item);
-
+        
+        
 
         //Task<TEntity> QueryById(object id);
         //Task<List<TEntity>> QueryByIds(object[] ids);
